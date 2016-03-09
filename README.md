@@ -1,0 +1,173 @@
+===============
+Yi-hack project
+===============
+
+Todo
+====
+
+* web server : add a link to the various rtsp feeds
+
+Purpose
+=======
+
+This project is a collection of scripts and binaries file to hack your Xiaomi Yi Ants camera.
+
+This camera has the default following features :
+* wifi
+* night vision
+* motion detection : a video file is generated if a motion have been detected in the last 60 seconds.
+* send video data over the network on Chinese servers in the cloud to allow people to view camera data from their smartphone wherever they are.
+* setup thanks to a smartphone application.
+* local video storage on a SD card
+* no RTSP server in the last firmwares
+
+This hack includes :
+* ntpclient (set date and time over internet)
+* Base firmware is : M release.
+* no more cloud feature (nothing goes out of your local network)
+* no more need to use a smartphone application
+* RTSP server activated
+* Telnet server activated
+* HTTP server activated
+* FTP server activated
+* No more (chinese) voices on startup
+
+Installation on the Yi camera
+=============================
+
+The memory card must stay in the camera ! If you remove it, the camera will start without using the hack.
+
+Prepare the memory card
+-----------------------
+
+Clone this repository on a computer :
+
+    git clone http://github.com/fritz-smh/yi-hack.git
+    
+Then, format a micro SD card in fat32 (vfat) format and copy the content of the **yi-hack/sd/** folder at the root of your memory card.
+
+The memory card will so contain :
+
+* home : the official firmware file compliant with this hack
+* test : the folder which contains the hack scripts and binaries
+* record : this folder will only be created when some video records will be added on the memory card by the camera
+* record_sub : this folder will only be created when some video records will be added on the memory card by the camera
+
+Configure the Yi camera on the memory card
+------------------------------------------
+
+You will need to set a static IP adresse to the camera. To check for the available IPs on your network, you can use the **Fing** application to scan the network on your Android smartphone.
+
+To configure the wifi network to use, edit the file **test/wpa_supplicant.conf**.
+
+To configure your IP address, open the file **test/yi-hack.cfg** and set the values.
+
+Start the camera
+----------------
+
+* If plugged, unplug the Yi camera
+* Insert the memory card in the Yi camera
+* Plug the Yi camera
+
+The camera will start. The led will indicate the current status :
+* orange : camera startup
+* blue blinking : network configuration in progress (connec to wifi, set up the IP address)
+* blue : network configuration is OK. Camera is ready to use.
+
+You can test is your camera is up and running this hack with your browser on url **http://ip/**. You should see this page :
+
+**TODO : picture **
+
+Warning : changes done on the original camera filesystem
+--------------------------------------------------------
+
+One change is needed on the camera filesystem which will not be reverted by removing the memory card : the file **/home/timeout.g726** is renamed to **/home/timeout.g726.OFF**.
+
+This is done because a process (rmm) tries to connect to the cloud process without success (as it is not started) and raise the play of a chinese voice timeout file. If this file would not be renamed, you would be bothered with this message.
+
+
+Use the camera
+==============
+
+Domogik
+-------
+
+You can easily use the Yi camera with the Domogik (http://www.domogik.org) home automation solution. You just need to install the **domogik-plugin-yi** package.
+
+Access the video stream over RTSP
+---------------------------------
+
+RTSP server is on port 554.
+
+You can access the video over RTSP on 3 urls : 
+* High definition video and audio (h264) : http://ip:554/ch0_0.h264
+* Low definition video and audio (h264) : http://ip:554/ch0_1.h264
+* Audio (h264) : http://ip:554/ch0_3.h264
+* TODO : the other one
+
+There is no login and password and currently no way to set it.
+
+Access the history of motion detection
+--------------------------------------
+
+Each time a motion is detected, the camera will generate a video file (60s max). This file is stored on the memory card and can be accessed over :
+* http server
+* ftp server
+
+The simplest way is to browse the file from the http server.
+
+To know if a motion have been detected in the last minute, you can check the url http://ip/motion (GET). It can give : 
+* when no motion is detected : an empty content
+* when motion is detected : a file path to the video file from the root of the http server
+
+Telnet server
+-------------
+
+The telnet server is on port 23.
+
+Default login/password : 
+* login = root
+* password = 1234qwer
+
+Ftp server
+----------
+
+The ftp server is on port 21.
+
+Default login/password : 
+* login = root
+* password = 1234qwer
+
+
+How it works ?
+==============
+
+Hack content
+------------
+
+```
+home                           Official firmware 
+test/                          Yi hack folder
+  yi-hack.cfg                  Yi hack configuration file
+  equip_test.sh                This script is called on camera startup and will launch all the needed processes
+  check_motion.sh              This script will check each minute if a motion video has been recorded and fill the **motion** file of the http server
+  rtspsrvK|L|M                 The various RTSP server binary releases (the final letter is corresponding to the firmware)
+  http/                        HTTP server folder
+    index.html                 HTTP server home page
+    record/                    Mount point to access video records
+    server                     HTTP server binary
+  wpa_supplicant.conf          Configuration file for wifi  
+  log.txt                      Log file of the hack (filled by equip_test.sh)
+````
+
+**TODO** : add network configuration file
+
+equip_test.sh
+-------------
+
+**TODO**
+
+check_motion.sh
+---------------
+
+**TODO**
