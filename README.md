@@ -2,15 +2,12 @@
 Yi-hack project
 ===============
 
-Todo
-====
-
-* web server : add a link to the various rtsp feeds
-
 Purpose
 =======
 
 This project is a collection of scripts and binaries file to hack your Xiaomi Yi Ants camera.
+
+![Alt text](yi.jpg?raw=true "Yi camera")
 
 This camera has the default following features :
 * wifi
@@ -76,7 +73,7 @@ The camera will start. The led will indicate the current status :
 
 You can test is your camera is up and running this hack with your browser on url **http://ip/**. You should see this page :
 
-**TODO : picture **
+![Alt text](http_server.png?raw=true "Yi camera HTTP server")
 
 Warning : changes done on the original camera filesystem
 --------------------------------------------------------
@@ -103,7 +100,6 @@ You can access the video over RTSP on 3 urls :
 * High definition video and audio (h264) : http://ip:554/ch0_0.h264
 * Low definition video and audio (h264) : http://ip:554/ch0_1.h264
 * Audio (h264) : http://ip:554/ch0_3.h264
-* TODO : the other one
 
 There is no login and password and currently no way to set it.
 
@@ -160,7 +156,6 @@ test/                          Yi hack folder
   log.txt                      Log file of the hack (filled by equip_test.sh)
 ````
 
-**TODO** : add network configuration file
 
 equip_test.sh
 -------------
