@@ -297,7 +297,7 @@ rm /home/hd1/FSCK*
 
 ### Final led color
 
-#led $(get_config LED_WHEN_READY)
+led $(get_config LED_WHEN_READY)
 
 ### to make sure log are written...
 
