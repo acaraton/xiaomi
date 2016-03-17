@@ -67,7 +67,7 @@ Start the camera
 * Plug the Yi camera
 
 The camera will start. The led will indicate the current status :
-* orange : camera startup
+* yellow : camera startup
 * blue blinking : network configuration in progress (connec to wifi, set up the IP address)
 * blue : network configuration is OK. Camera is ready to use.
 
