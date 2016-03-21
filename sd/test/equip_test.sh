@@ -45,7 +45,8 @@ led() {
                                                                                                                                                                  
 }       
 
-LOG_FILE=/home/hd1/test/log.txt
+LOG_DIR=/home/hd1/test/
+LOG_FILE=${LOG_DIR}/log.txt
 
 log_init() {
     # clean the previous log file and add a starting line
@@ -68,13 +69,18 @@ get_config() {
 ### first we assume that this script is started from /home/init.sh and will replace it from the below lines (which are not commented in init.sh :
 
 #if [ -f "/home/hd1/test/equip_test.sh" ]; then
-#	/home/hd1/test/equip_test.sh
-#	exit
+#       /home/hd1/test/equip_test.sh
+#       exit
 #fi
 
 ######################################################
 # start of our custom script !!!!!!
 ######################################################
+
+### Launch Telnet server
+log "Start telnet server..."
+telnetd &
+
 
 ### Get FIRMWARE version
 FIRMWARE_VERSION=$(sed -n 's/version=1.8.5.1\(.\)_.*/\1/p' /home/version)
@@ -84,7 +90,6 @@ FIRMWARE_VERSION=$(sed -n 's/version=1.8.5.1\(.\)_.*/\1/p' /home/version)
 echo "GMT-1" > /etc/TZ
 
 ### get time is done after wifi configuration!
-
 
 
 
@@ -166,7 +171,7 @@ cd /home
 ./dispatch &
 ./exnet &
 #./mysystem &
-	
+        
 count=5
 
 while [ $count -gt 0 ]
@@ -191,6 +196,7 @@ cp /home/hd1/test/wpa_supplicant.conf /home/wpa_supplicant.conf
 log_init
 log "The blue led is currently blinking"
 log "Firmware version letter = $FIRMWARE_VERSION"
+log "Debug mode = $(get_config DEBUG)"
 
 # first, configure wifi
 
@@ -231,7 +237,7 @@ root_pwd=$(get_config ROOT_PASSWORD)
 log "Start blue led on"
 led -yoff -bon
 
-	
+        
 ### Rename the timeout sound file to avoid being spammed with chinese audio stuff...
 [ -f /home/timeout.g726 ] && mv /home/timeout.g726 /home/timeout.g726.OFF
 
@@ -244,6 +250,15 @@ cd /home
 
 sync
 
+### Launch FTP server
+log "Start ftp server..."
+if [[ $(get_config DEBUG) == "yes" ]] ; then
+    tcpsvd -vE 0.0.0.0 21 ftpd -w / > /${LOG_DIR}/log_ftp.txt 2>&1 &
+else
+    tcpsvd -vE 0.0.0.0 21 ftpd -w / &
+fi
+
+
 ### Launch web server
 
 cd /home/hd1/test/http/
@@ -251,7 +266,11 @@ mkdir /home/hd1/test/http/record/
 mount -o bind /home/hd1/record/ /home/hd1/test/http/record/
 touch /home/hd1/test/http/motion
 log "Start http server..."
-./server 80 &
+if [[ $(get_config DEBUG) == "yes" ]] ; then
+    ./server 80  > /${LOG_DIR}/log_http.txt 2>&1 &
+else
+    ./server 80 &
+fi
 log "Done"
 
 sync
@@ -268,7 +287,11 @@ cd /home
 
 ### Rtsp server
 cd /home/hd1/test/
-./rtspsvrM &
+if [[ $(get_config DEBUG) == "yes" ]] ; then
+    ./rtspsvrM > /${LOG_DIR}/log_rtsp.txt 2>&1 &
+else:
+    ./rtspsvrM &
+fi
 
 sleep 5
 
@@ -298,13 +321,14 @@ rm /home/hd1/FSCK*
 ### Final led color
 
 led $(get_config LED_WHEN_READY)
+
+### List the processes after startup
 log "Processes after startup :"
 ps >> ${LOG_FILE}
 
 ### to make sure log are written...
 
 sync
-
 
 
 
