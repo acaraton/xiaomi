@@ -289,7 +289,7 @@ cd /home
 cd /home/hd1/test/
 if [[ $(get_config DEBUG) == "yes" ]] ; then
     ./rtspsvrM > /${LOG_DIR}/log_rtsp.txt 2>&1 &
-else:
+else
     ./rtspsvrM &
 fi
 
