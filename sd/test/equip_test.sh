@@ -298,6 +298,8 @@ rm /home/hd1/FSCK*
 ### Final led color
 
 led $(get_config LED_WHEN_READY)
+log "Processes after startup :"
+ps >> ${LOG_FILE}
 
 ### to make sure log are written...
 
