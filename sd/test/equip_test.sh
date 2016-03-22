@@ -69,8 +69,8 @@ get_config() {
 ### first we assume that this script is started from /home/init.sh and will replace it from the below lines (which are not commented in init.sh :
 
 #if [ -f "/home/hd1/test/equip_test.sh" ]; then
-#       /home/hd1/test/equip_test.sh
-#       exit
+#	/home/hd1/test/equip_test.sh
+#	exit
 #fi
 
 ######################################################
@@ -81,9 +81,6 @@ get_config() {
 log "Start telnet server..."
 telnetd &
 
-
-### Get FIRMWARE version
-FIRMWARE_VERSION=$(sed -n 's/version=1.8.5.1\(.\)_.*/\1/p' /home/version)
 
 ### configure timezone
 # paris winter
@@ -171,7 +168,7 @@ cd /home
 ./dispatch &
 ./exnet &
 #./mysystem &
-        
+	
 count=5
 
 while [ $count -gt 0 ]
@@ -194,8 +191,13 @@ cp /home/hd1/test/wpa_supplicant.conf /home/wpa_supplicant.conf
 
 ### Init logs
 log_init
+# Put version informations in logs
+log "Version informations : "
+cat /home/version | sed "s/^/    /" >> ${LOG_FILE}
+FIRMWARE_LETTER=$(cat /home/version | grep "version=" | head -1 | cut -d"=" -f2 | sed "s/^[0-9]\.[0-9]\.[0-9]\.[0-9]\([A-Z]\).*/\1/")
+log "Firmware letter is : '${FIRMWARE_LETTER}'"
+
 log "The blue led is currently blinking"
-log "Firmware version letter = $FIRMWARE_VERSION"
 log "Debug mode = $(get_config DEBUG)"
 
 # first, configure wifi
@@ -205,7 +207,7 @@ log $(find /home -name "wpa_supplicant.conf")
 
 log "Start wifi configuration..."
 log $(/home/wpa_supplicant -B -i ra0 -c /home/wpa_supplicant.conf )
-log "Status=$?"
+log "Status for wifi configuration=$?  (0 is ok)"
 
 log "Do network configuration 1/2 (ip and gateway)"
 #ifconfig ra0 192.168.1.121 netmask 255.255.255.0
@@ -215,7 +217,7 @@ route add default gw $(get_config GATEWAY)
 log "Done"
 
 log "Configuration is :"
-log $(ifconfig)
+ifconfig | sed "s/^/    /" >> ${LOG_FILE}
 
 ### configure DNS (google one)
 log "Do network configuration 2/2 (DNS)"
@@ -237,7 +239,7 @@ root_pwd=$(get_config ROOT_PASSWORD)
 log "Start blue led on"
 led -yoff -bon
 
-        
+	
 ### Rename the timeout sound file to avoid being spammed with chinese audio stuff...
 [ -f /home/timeout.g726 ] && mv /home/timeout.g726 /home/timeout.g726.OFF
 
@@ -254,9 +256,12 @@ sync
 log "Start ftp server..."
 if [[ $(get_config DEBUG) == "yes" ]] ; then
     tcpsvd -vE 0.0.0.0 21 ftpd -w / > /${LOG_DIR}/log_ftp.txt 2>&1 &
+    res=$?
 else
     tcpsvd -vE 0.0.0.0 21 ftpd -w / &
+    res=$?
 fi
+log "Status for ftp server=$res  (0 is ok)"
 
 
 ### Launch web server
@@ -265,13 +270,15 @@ cd /home/hd1/test/http/
 mkdir /home/hd1/test/http/record/
 mount -o bind /home/hd1/record/ /home/hd1/test/http/record/
 touch /home/hd1/test/http/motion
-log "Start http server..."
+log "Start http server : server${FIRMWARE_LETTER}..."
 if [[ $(get_config DEBUG) == "yes" ]] ; then
-    ./server 80  > /${LOG_DIR}/log_http.txt 2>&1 &
+    ./server${FIRMWARE_LETTER} 80  > /${LOG_DIR}/log_http.txt 2>&1 &
+    res=$?
 else
-    ./server 80 &
+    ./server${FIRMWARE_LETTER} 80 &
+    res=$?
 fi
-log "Done"
+log "Status for http server=$res  (0 is ok)"
 
 sync
 
@@ -287,11 +294,15 @@ cd /home
 
 ### Rtsp server
 cd /home/hd1/test/
+log "Start rtsp server : rtspsvr${FIRMWARE_LETTER}..."
 if [[ $(get_config DEBUG) == "yes" ]] ; then
-    ./rtspsvrM > /${LOG_DIR}/log_rtsp.txt 2>&1 &
+    ./rtspsvr${FIRMWARE_LETTER} > /${LOG_DIR}/log_rtsp.txt 2>&1 &
+    res=$?
 else
-    ./rtspsvrM &
+    ./rtspsvr${FIRMWARE_LETTER} &
+    res=$?
 fi
+log "Status for rtsp server=$res  (0 is ok)"
 
 sleep 5
 
@@ -329,6 +340,7 @@ ps >> ${LOG_FILE}
 ### to make sure log are written...
 
 sync
+
 
 
 
