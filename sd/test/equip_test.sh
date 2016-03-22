@@ -210,6 +210,9 @@ echo "Firmware letter is : '${FIRMWARE_LETTER}'" >> ${TMP_VERSION_FILE}
 
 cat ${TMP_VERSION_FILE} >> ${LOG_FILE}
 
+log "Check for some files size..."
+ls -l /home/hd1/test/rtspsvr* /home/hd1/test/http/server* | sed "s/^/    /" >> ${LOG_FILE}
+
 log "The blue led is currently blinking"
 log "Debug mode = $(get_config DEBUG)"
 
@@ -269,12 +272,12 @@ sync
 log "Start ftp server..."
 if [[ $(get_config DEBUG) == "yes" ]] ; then
     tcpsvd -vE 0.0.0.0 21 ftpd -w / > /${LOG_DIR}/log_ftp.txt 2>&1 &
-    res=$?
 else
     tcpsvd -vE 0.0.0.0 21 ftpd -w / &
-    res=$?
 fi
-log "Status for ftp server=$res  (0 is ok)"
+sleep 1
+log "Check for ftp process : "
+ps | grep tcpsvd | grep -v grep >> ${LOG_FILE}
 
 
 ### Launch web server
@@ -294,12 +297,12 @@ touch /home/hd1/test/http/motion
 log "Start http server : server${FIRMWARE_LETTER}..."
 if [[ $(get_config DEBUG) == "yes" ]] ; then
     ./server${FIRMWARE_LETTER} 80  > /${LOG_DIR}/log_http.txt 2>&1 &
-    res=$?
 else
     ./server${FIRMWARE_LETTER} 80 &
-    res=$?
 fi
-log "Status for http server=$res  (0 is ok)"
+sleep 1
+log "Check for http server process : "
+ps | grep server | grep -v grep | grep -v log_server >> ${LOG_FILE}
 
 sync
 
@@ -318,12 +321,12 @@ cd /home/hd1/test/
 log "Start rtsp server : rtspsvr${FIRMWARE_LETTER}..."
 if [[ $(get_config DEBUG) == "yes" ]] ; then
     ./rtspsvr${FIRMWARE_LETTER} > /${LOG_DIR}/log_rtsp.txt 2>&1 &
-    res=$?
 else
     ./rtspsvr${FIRMWARE_LETTER} &
-    res=$?
 fi
-log "Status for rtsp server=$res  (0 is ok)"
+sleep 1
+log "Check for rtsp process : "
+ps | grep rtspsvr | grep -v grep >> ${LOG_FILE}
 
 sleep 5
 
