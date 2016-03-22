@@ -130,9 +130,7 @@ Ftp server
 
 The ftp server is on port 21.
 
-Default login/password : 
-* login = root
-* password = 1234qwer
+There is no login/password required.
 
 
 How it works ?
