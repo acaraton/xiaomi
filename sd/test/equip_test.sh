@@ -159,7 +159,12 @@ rm /home/web/sd/* -rf
    
 cd /home/3518
 ./load3518_left -i
+
+### Detect the hardware version
+# result will be written in /tmp/hwplatform
 /home/detect_ver
+
+
 himm 0x20050074 0x06802424
    
 ### what is this ?
@@ -191,11 +196,19 @@ cp /home/hd1/test/wpa_supplicant.conf /home/wpa_supplicant.conf
 
 ### Init logs
 log_init
-# Put version informations in logs
-log "Version informations : "
-cat /home/version | sed "s/^/    /" >> ${LOG_FILE}
+# Put version informations in logs and a file which will be included in the http server default page
+TMP_VERSION_FILE=/tmp/version_information
+rm -f ${TMP_VERSION_FILE}
+echo "Hardware version informations : " >> ${TMP_VERSION_FILE}
+cat /tmp/hwplatform | sed "s/^/    /" >> ${TMP_VERSION_FILE}
+
+echo "Software version informations : " >> ${TMP_VERSION_FILE}
+cat /home/version | sed "s/^/    /" >> ${TMP_VERSION_FILE}
+
 FIRMWARE_LETTER=$(cat /home/version | grep "version=" | head -1 | cut -d"=" -f2 | sed "s/^[0-9]\.[0-9]\.[0-9]\.[0-9]\([A-Z]\).*/\1/")
-log "Firmware letter is : '${FIRMWARE_LETTER}'"
+echo "Firmware letter is : '${FIRMWARE_LETTER}'" >> ${TMP_VERSION_FILE}
+
+cat ${TMP_VERSION_FILE} >> ${LOG_FILE}
 
 log "The blue led is currently blinking"
 log "Debug mode = $(get_config DEBUG)"
@@ -266,10 +279,18 @@ log "Status for ftp server=$res  (0 is ok)"
 
 ### Launch web server
 
+# first, prepare the index.html page
 cd /home/hd1/test/http/
+cat index.html.tpl_header ${TMP_VERSION_FILE} index.html.tpl_footer > index.html
+
+# then, bind the record folder
 mkdir /home/hd1/test/http/record/
 mount -o bind /home/hd1/record/ /home/hd1/test/http/record/
+
+# prepare the GET /motion url
 touch /home/hd1/test/http/motion
+
+# start the server
 log "Start http server : server${FIRMWARE_LETTER}..."
 if [[ $(get_config DEBUG) == "yes" ]] ; then
     ./server${FIRMWARE_LETTER} 80  > /${LOG_DIR}/log_http.txt 2>&1 &
