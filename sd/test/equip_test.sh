@@ -208,6 +208,21 @@ cat /home/version | sed "s/^/    /" >> ${TMP_VERSION_FILE}
 FIRMWARE_LETTER=$(cat /home/version | grep "version=" | head -1 | cut -d"=" -f2 | sed "s/^[0-9]\.[0-9]\.[0-9]\.[0-9]\([A-Z]\).*/\1/")
 echo "Firmware letter is : '${FIRMWARE_LETTER}'" >> ${TMP_VERSION_FILE}
 
+# TODO : do the same for the http server
+#case ${FIRMWARE_LETTER} in
+#    M) RTSP_VERSION='M'
+#        ;;
+#    K|L) RTSP_VERSION='K'
+#        ;;
+#    B|E|F|H|I|J) RTSP_VERSION='I'
+#        ;;
+#    *) RTSP_VERSION='None'
+#        log "WARNING : I don't know which RTSP binary version is compliant with your firmware!"
+#        ;;
+#esac
+#log "The RTSP server binary version which will be used is the '${RTSP_VERSION}'"
+
+
 cat ${TMP_VERSION_FILE} >> ${LOG_FILE}
 
 log "Check for some files size..."
