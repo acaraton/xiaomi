@@ -208,22 +208,46 @@ cat /home/version | sed "s/^/    /" >> ${TMP_VERSION_FILE}
 FIRMWARE_LETTER=$(cat /home/version | grep "version=" | head -1 | cut -d"=" -f2 | sed "s/^[0-9]\.[0-9]\.[0-9]\.[0-9]\([A-Z]\).*/\1/")
 echo "Firmware letter is : '${FIRMWARE_LETTER}'" >> ${TMP_VERSION_FILE}
 
-# TODO : do the same for the http server
-#case ${FIRMWARE_LETTER} in
-#    M) RTSP_VERSION='M'
-#        ;;
-#    K|L) RTSP_VERSION='K'
-#        ;;
-#    B|E|F|H|I|J) RTSP_VERSION='I'
-#        ;;
-#    *) RTSP_VERSION='None'
-#        log "WARNING : I don't know which RTSP binary version is compliant with your firmware!"
-#        ;;
-#esac
-#log "The RTSP server binary version which will be used is the '${RTSP_VERSION}'"
-
-
 cat ${TMP_VERSION_FILE} >> ${LOG_FILE}
+
+case ${FIRMWARE_LETTER} in
+    # 1.8.6.1
+    A)  # NOT TESTTED YET
+        RTSP_VERSION='M'
+        HTTP_VERSION='M'
+        ;;
+        
+    # 1.8.5.1
+    M)  # Tested :)
+        RTSP_VERSION='M'
+        HTTP_VERSION='M'
+        ;;
+        
+    L)  # Tested :)
+        RTSP_VERSION='M'
+        HTTP_VERSION='M'
+        ;;
+        
+    K)  # NOT TESTED YET
+        RTSP_VERSION='K'
+        HTTP_VERSION='M'
+        ;;
+        
+    B|E|F|H|I|J)  # NOT TESTED YET
+        RTSP_VERSION='I'
+        HTTP_VERSION='J'
+        ;;
+        
+    *) 
+        RTSP_VERSION='M'
+        HTTP_VERSION='M'
+        log "WARNING : I don't know which RTSP binary version is compliant with your firmware! I will try to use the M..."
+        ;;
+esac
+log "The RTSP server binary version which will be used is the '${RTSP_VERSION}'"
+log "The HTTP server binary version which will be used is the '${HTTP_VERSION}'"
+
+
 
 log "Check for some files size..."
 ls -l /home/hd1/test/rtspsvr* /home/hd1/test/http/server* | sed "s/^/    /" >> ${LOG_FILE}
@@ -309,11 +333,11 @@ mount -o bind /home/hd1/record/ /home/hd1/test/http/record/
 touch /home/hd1/test/http/motion
 
 # start the server
-log "Start http server : server${FIRMWARE_LETTER}..."
+log "Start http server : server${HTTP_VERSION}..."
 if [[ $(get_config DEBUG) == "yes" ]] ; then
-    ./server${FIRMWARE_LETTER} 80  > /${LOG_DIR}/log_http.txt 2>&1 &
+    ./server${HTTP_VERSION} 80  > /${LOG_DIR}/log_http.txt 2>&1 &
 else
-    ./server${FIRMWARE_LETTER} 80 &
+    ./server${HTTP_VERSION} 80 &
 fi
 sleep 1
 log "Check for http server process : "
@@ -333,11 +357,11 @@ cd /home
 
 ### Rtsp server
 cd /home/hd1/test/
-log "Start rtsp server : rtspsvr${FIRMWARE_LETTER}..."
+log "Start rtsp server : rtspsvr${RTSP_VERSION}..."
 if [[ $(get_config DEBUG) == "yes" ]] ; then
-    ./rtspsvr${FIRMWARE_LETTER} > /${LOG_DIR}/log_rtsp.txt 2>&1 &
+    ./rtspsvr${RTSP_VERSION} > /${LOG_DIR}/log_rtsp.txt 2>&1 &
 else
-    ./rtspsvr${FIRMWARE_LETTER} &
+    ./rtspsvr${RTSP_VERSION} &
 fi
 sleep 1
 log "Check for rtsp process : "

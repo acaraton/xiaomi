@@ -83,6 +83,15 @@ One change is needed on the camera filesystem which will not be reverted by remo
 This is done because a process (rmm) tries to connect to the cloud process without success (as it is not started) and raise the play of a chinese voice timeout file. If this file would not be renamed, you would be bothered with this message.
 
 
+How can I know which is the version of a firmware 'home' file ?
+===============================================================
+
+Just do : **strings home  | grep version**. Example :
+
+    $ strings home  | grep 1.8.5
+    version=1.8.5.1M_201512011815
+
+
 Use the camera
 ==============
 
