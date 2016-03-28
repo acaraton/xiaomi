@@ -82,9 +82,8 @@ log "Start telnet server..."
 telnetd &
 
 
-### configure timezone
-# paris winter
-echo "GMT-1" > /etc/TZ
+### configure timezone                                                                                                                                                                               
+echo "$(get_config TIMEZONE)" > /etc/TZ             
 
 ### get time is done after wifi configuration!
 
