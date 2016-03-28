@@ -279,12 +279,16 @@ log "Do network configuration 2/2 (DNS)"
 echo "nameserver 8.8.8.8" > /etc/resolv.conf
 log "Done"
 
-### configure time on a NTP server
+### configure time on a NTP server                    
 log "Get time from a NTP server..."
+NTP_SERVER=$(get_config NTP_SERVER)                  
+log "But first, test the NTP server '${NTP_SERVER}':"
+ping -c1 ${NTP_SERVER} >> ${LOG_FILE}
 log "Previous datetime is $(date)"
-ntpd -q -p 0.uk.pool.ntp.org
-log "Done"
+ntpd -q -p ${NTP_SERVER}
+log "Done"                   
 log "New datetime is $(date)"
+
 
 ### set the root password
 root_pwd=$(get_config ROOT_PASSWORD)
