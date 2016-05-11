@@ -12,3 +12,9 @@ Configure the script :
 * ftp_pass value, indicate the password of the user before for permision to save in the folder.
 
 Add the script to the crontab of your yi camera
+
+Source of the script : 
+
+* https://github.com/fritz-smh/yi-hack/pull/24
+* http://4pda.ru/forum/index.php?showtopic=638230&st=2780#entry44208114
+

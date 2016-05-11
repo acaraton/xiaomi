@@ -142,6 +142,12 @@ The ftp server is on port 21.
 There is no login/password required.
 
 
+I want more !
+=============
+
+Some scripts are provided in the **sd/test/scripts** folder. Please read the **README.md** file in this folder for more informations.
+
+
 How it works ?
 ==============
 
