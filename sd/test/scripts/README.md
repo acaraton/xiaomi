@@ -18,3 +18,9 @@ Source of the script :
 * https://github.com/fritz-smh/yi-hack/pull/24
 * http://4pda.ru/forum/index.php?showtopic=638230&st=2780#entry44208114
 
+cleanup.sh
+==========
+
+This script will cleanup video files older than 15 days.
+
+You need to add it in the crontab
