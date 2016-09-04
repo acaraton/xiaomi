@@ -18,7 +18,7 @@
 # How it works
 # ============
 #
-# See http://github.com/fritz-smh/yi-hack/ 
+# See http://github.com/fritz-smh/yi-hack/
 #
 # TODO
 # ====
@@ -26,24 +26,23 @@
 # * strem audio from network to camera  ==> svoxpico ?
 # * create a watchdog script
 
-
 led() {
     # example usage :
-    #    led -boff -yon 
+    #    led -boff -yon
     # options :
-    #    -bfast  
-    #    -bon    
-    #    -boff   
-    #    -yfast  
-    #    -yon    
-    #    -yoff 
-    
+    #    -bfast
+    #    -bon
+    #    -boff
+    #    -yfast
+    #    -yon
+    #    -yoff
+
     # first, kill current led_ctl process
-    kill $(ps | grep led_ctl | grep -v grep | awk '{print $1}')                                                                                  
-    # then process                                                                                                                               
+    kill $(ps | grep led_ctl | grep -v grep | awk '{print $1}')
+    # then process
     /home/led_ctl $@ &
-                                                                                                                                                                 
-}       
+
+}
 
 LOG_DIR=/home/hd1/test/
 LOG_FILE=${LOG_DIR}/log.txt
@@ -69,8 +68,8 @@ get_config() {
 ### first we assume that this script is started from /home/init.sh and will replace it from the below lines (which are not commented in init.sh :
 
 #if [ -f "/home/hd1/test/equip_test.sh" ]; then
-#	/home/hd1/test/equip_test.sh
-#	exit
+#   /home/hd1/test/equip_test.sh
+#   exit
 #fi
 
 ######################################################
@@ -82,8 +81,9 @@ log "Start telnet server..."
 telnetd &
 
 
-### configure timezone                                                                                                                                                                               
-echo "$(get_config TIMEZONE)" > /etc/TZ             
+### configure timezone
+
+echo "$(get_config TIMEZONE)" > /etc/TZ
 
 ### get time is done after wifi configuration!
 
@@ -113,6 +113,10 @@ cd /home/3518
 # added :
 himm 0x20050074 0x06802424
 
+### Let ppl hear that we start
+/home/rmm "/home/hd1/voice/welcome.g726" 1
+/home/rmm "/home/hd1/voice/wait.g726" 1
+
 ### start blinking blue led for configuration in progress
 #/home/led_ctl -boff -yon &
 led -yoff -bfast
@@ -136,14 +140,14 @@ mount -t mqueue none /dev/mqueue
 /home/gethwplatform
 
 #now begin app
-sysctl -w net.ipv4.tcp_mem='3072    4096    2000000' 
+sysctl -w net.ipv4.tcp_mem='3072    4096    2000000'
 sysctl -w net.core.wmem_max='2000000'
-sysctl -w net.ipv4.tcp_keepalive_time=300 net.ipv4.tcp_keepalive_intvl=6 net.ipv4.tcp_keepalive_probes=3 
-         
+sysctl -w net.ipv4.tcp_keepalive_time=300 net.ipv4.tcp_keepalive_intvl=6 net.ipv4.tcp_keepalive_probes=3
+
 insmod /home/as-iosched.ko
-echo "anticipatory" > /sys/block/mmcblk0/queue/scheduler 
-echo "1024" > /sys/block/mmcblk0/queue/read_ahead_kb   
-   
+echo "anticipatory" > /sys/block/mmcblk0/queue/scheduler
+echo "1024" > /sys/block/mmcblk0/queue/read_ahead_kb
+
 ### The followinf unmount+mount of hd1 allows a rw mount (on startup, it is ro mounted)
 
 umount /home/hd1
@@ -155,7 +159,7 @@ mount -t vfat /dev/hd2 /home/hd2
 mkdir /home/hd2/record_sub
 rm /home/web/sd/* -rf
 
-   
+
 cd /home/3518
 ./load3518_left -i
 
@@ -165,24 +169,24 @@ cd /home/3518
 
 
 himm 0x20050074 0x06802424
-   
+
 ### what is this ?
-cd /home                  
-./peripheral &   
+cd /home
+./peripheral &
 ./dispatch &
 ./exnet &
 #./mysystem &
-	
+
 count=5
 
 while [ $count -gt 0 ]
 do
-if [ -f "/tmp/init_finish" ]; then         
-        break
+if [ -f "/tmp/init_finish" ]; then
+    break
 else
-        count=`expr $count - 1`
-        echo "wait init" $count
-        sleep 1
+    count=`expr $count - 1`
+    echo "wait init" $count
+    sleep 1
 fi
 done
 
@@ -215,29 +219,29 @@ case ${FIRMWARE_LETTER} in
         RTSP_VERSION='M'
         HTTP_VERSION='M'
         ;;
-        
+
     # 1.8.5.1
     M)  # Tested :)
         RTSP_VERSION='M'
         HTTP_VERSION='M'
         ;;
-        
+
     L)  # Tested :)
         RTSP_VERSION='M'
         HTTP_VERSION='M'
         ;;
-        
+
     K)  # NOT TESTED YET
         RTSP_VERSION='K'
         HTTP_VERSION='M'
         ;;
-        
+
     B|E|F|H|I|J)  # NOT TESTED YET
         RTSP_VERSION='I'
         HTTP_VERSION='J'
         ;;
-        
-    *) 
+
+    *)
         RTSP_VERSION='M'
         HTTP_VERSION='M'
         log "WARNING : I don't know which RTSP binary version is compliant with your firmware! I will try to use the M..."
@@ -256,12 +260,16 @@ log "Debug mode = $(get_config DEBUG)"
 
 # first, configure wifi
 
+### Let ppl hear that we start connect wifi
+/home/rmm "/home/hd1/voice/connectting.g726" 1
+
 log "Check for wifi configuration file...*"
 log $(find /home -name "wpa_supplicant.conf")
 
 log "Start wifi configuration..."
-log $(/home/wpa_supplicant -B -i ra0 -c /home/wpa_supplicant.conf )
+res=$(/home/wpa_supplicant -B -i ra0 -c /home/wpa_supplicant.conf )
 log "Status for wifi configuration=$?  (0 is ok)"
+log "Wifi configuration answer: $res"
 
 log "Do network configuration 1/2 (ip and gateway)"
 #ifconfig ra0 192.168.1.121 netmask 255.255.255.0
@@ -278,16 +286,22 @@ log "Do network configuration 2/2 (DNS)"
 echo "nameserver 8.8.8.8" > /etc/resolv.conf
 log "Done"
 
-### configure time on a NTP server                    
+### configure time on a NTP server
 log "Get time from a NTP server..."
-NTP_SERVER=$(get_config NTP_SERVER)                  
+NTP_SERVER=$(get_config NTP_SERVER)
 log "But first, test the NTP server '${NTP_SERVER}':"
 ping -c1 ${NTP_SERVER} >> ${LOG_FILE}
 log "Previous datetime is $(date)"
 ntpd -q -p ${NTP_SERVER}
-log "Done"                   
+log "Done"
 log "New datetime is $(date)"
 
+
+### Check if reach gateway and notify
+ping -c1 -W2 $(get_config GATEWAY) > /dev/null
+if [ 0 -eq $? ]; then
+    /home/rmm "/home/hd1/voice/wifi_connected.g726" 1
+fi
 
 ### set the root password
 root_pwd=$(get_config ROOT_PASSWORD)
@@ -297,16 +311,9 @@ root_pwd=$(get_config ROOT_PASSWORD)
 log "Start blue led on"
 led -yoff -bon
 
-	
+
 ### Rename the timeout sound file to avoid being spammed with chinese audio stuff...
 [ -f /home/timeout.g726 ] && mv /home/timeout.g726 /home/timeout.g726.OFF
-
-### Rmm stuff
-# without this, most things does not work (http server, rtsp)
-# It starts to use the cloud (which is no more launched) so you will find timeout in the logs
-cd /home  
-./rmm &
-
 
 sync
 
@@ -355,22 +362,6 @@ cd /home
 ./record_event &
 ./mp4record 60 &
 
-### Launch script to check for motion the last minute
-/home/hd1/test/check_motion.sh &
-
-### Rtsp server
-cd /home/hd1/test/
-log "Start rtsp server : rtspsvr${RTSP_VERSION}..."
-if [[ $(get_config DEBUG) == "yes" ]] ; then
-    ./rtspsvr${RTSP_VERSION} > /${LOG_DIR}/log_rtsp.txt 2>&1 &
-else
-    ./rtspsvr${RTSP_VERSION} &
-fi
-sleep 1
-log "Check for rtsp process : "
-ps | grep rtspsvr | grep -v grep >> ${LOG_FILE}
-
-sleep 5
 
 ### Some configuration
 
@@ -395,13 +386,55 @@ himm 0x20030048 0x302
 
 rm /home/hd1/FSCK*
 
+# Check and create crontabs folder
+crontab_folder="/var/spool/cron/crontabs"
+if [ ! -r "$crontab_folder" ]; then
+    mkdir -p "$crontab_folder"
+fi
+# Start crond daemon
+/usr/sbin/crond -b
+
 ### Final led color
 
-led $(get_config LED_WHEN_READY)
+### Check if reach gateway and notify
+ping -c1 -W2 $(get_config GATEWAY) > /dev/null
+if [ 0 -eq $? ]; then
+    led $(get_config LED_WHEN_READY)
+    /home/rmm "/home/hd1/voice/success.g726" 1
+else
+    led -boff -yfast
+fi
+
+### Rmm stuff
+# without this, most things does not work (http server, rtsp)
+# It starts to use the cloud (which is no more launched) so you will find timeout in the logs
+# This must be launched after all "/home/rmm" command calls
+cd /home
+./rmm &
+
+
+### Rtsp server
+cd /home/hd1/test/
+log "Start rtsp server : rtspsvr${RTSP_VERSION}..."
+if [[ $(get_config DEBUG) == "yes" ]] ; then
+    ./rtspsvr${RTSP_VERSION} > /${LOG_DIR}/log_rtsp.txt 2>&1 &
+else
+    ./rtspsvr${RTSP_VERSION} &
+fi
+sleep 1
+log "Check for rtsp process : "
+ps | grep rtspsvr | grep -v grep >> ${LOG_FILE}
+
+sleep 5
+
 
 ### List the processes after startup
 log "Processes after startup :"
 ps >> ${LOG_FILE}
+
+### List storage status
+log "Storage status :"
+df -h >> ${LOG_FILE}
 
 ### to make sure log are written...
 
