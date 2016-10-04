@@ -275,7 +275,7 @@ ifconfig | sed "s/^/    /" >> ${LOG_FILE}
 
 ### configure DNS (google one)
 log "Do network configuration 2/2 (DNS)"
-echo "nameserver 8.8.8.8" > /etc/resolv.conf
+echo "nameserver $(get_config NAMESERVER)" > /etc/resolv.conf
 log "Done"
 
 ### configure time on a NTP server                    
