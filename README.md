@@ -152,6 +152,26 @@ I want more !
 
 Some scripts are provided in the **sd/test/scripts** folder. Please read the **README.md** file in this folder for more informations.
 
+Uninstall the hack
+==================
+
+First, remove the SD card. But keep in mind that the timeout sound has been altered.
+
+If you want the timeout sound back:
+Edit equip_test.sh to look like this:
+
+    #!/bin/sh
+    ######################################################
+    # Xiaomi Yi hack restore
+    ######################################################
+     
+    ### Rename back the timeout sound file ...
+    [ -f /home/timeout.g726.OFF ] && mv /home/timeout.g726.OFF /home/timeout.g726
+     
+    sync
+
+Then reboot the camera so the script runs. After remove the stuff from sd card and you are all original.
+
 
 How it works ?
 ==============
@@ -186,3 +206,5 @@ check_motion.sh
 Script that runs from equip_test.sh and tell us if a new video was created in the last minute (a video file is created in case of motion detection).
 
 If a file is found, it adds the name of the file to the section GET /motion on the http server.
+
+
