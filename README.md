@@ -2,6 +2,19 @@
 Yi-hack project
 ===============
 
+Personnal note - 4 october 2016
+===============================
+
+Hi, I am Fritz, the one who created this project. Since summer 2016, I have a lot of other topics to work on (especially the Domogik home automation project) and I have nearly to time for this project.
+
+I would like to say THANK YOU to the people who are currently helping the others in the issues opened and who have submitted some pull requests! Your help is really welcome and I am very happy that this project  is interesting to many people !!!
+
+Thanks again to all of you, users and contributors !
+
+If one of the regular contributor wish to got some administrator permissions to this repository, please, just create an issue and I will be happy to give you the access.
+
+-- Fritz
+
 Purpose
 =======
 
